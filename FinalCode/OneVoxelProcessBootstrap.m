@@ -26,6 +26,7 @@ if Model.Nboot > 0
         Results.BCaCI = CreateBCaCI(Results,BootStrap,JackKnife,Model.Thresholds);
 %        Results.BoLBBCaCI = BoLBBcACI;
     catch me
+	fprintf(1,'%s\n', me.message);
 %        error('error!');
         Results = [];
     end

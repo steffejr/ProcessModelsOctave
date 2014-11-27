@@ -5,12 +5,12 @@ function Results = CycleOverVoxelsProcessBootstrap(ModelInfo)
 % is passed a structure or a filename. If it is passed a structure the data
 % in that structure is processed. If it is passed a file name, the data is
 % loaded from the file and then processed. 
-%
+
 
 ClusterJobFlag = 0;
 if ~isstruct(ModelInfo)
     % If a structure is NOT passed
-    if exist([ModelInfo '.mat'],'file') == 2
+    if exist([ModelInfo ],'file') == 2
         ClusterJobFlag = 1;
         % If this function is being used by a cluster and reading the input
         % data from a file, the output also needs to be saved to a file.
@@ -36,18 +36,19 @@ if ~isstruct(ModelInfo)
     end
 end
    
-
+fprintf(1,'Loaded data\n');
 % The number of voxels variable refers to the number of voxels being
 % analyzed in this chunk. If the data is being split into chunks for
 % analysis on a cluster then this number will differe from teh total number
 % of voxels in the analysis.
 Nvoxels = length(ModelInfo.Indices);
+fprintf(1,'\nThere are %d voxels to process in this job.\n',Nvoxels);
 % Prepare the output structure
 Results = cell(Nvoxels,1);
 count = 0;
 if Nvoxels > 1
-   parfor i = 1:Nvoxels
-        %t = tic;
+   for i = 1:Nvoxels
+        tic;
         
         % Extract the data for this voxel
         OneVoxelModel = ExtractDataFromVoxel(ModelInfo,i);
@@ -72,8 +73,9 @@ if Nvoxels > 1
             end
         end
         count = count + 1;
-        fprintf(1,'Finished %d jobs out of %d.\n',count,Nvoxels);
-        %fprintf(1,'%d of %d voxels in %0.2f seconds.\n',i,Nvoxels,toc(t));
+        %fprintf(1,'Finished %d jobs out of %d.\n',count,Nvoxels);
+	t = toc;
+        fprintf(1,'%d of %d voxels in %0.2s\n',i,Nvoxels,t);
     end
 else
     % Extract the data for this voxel

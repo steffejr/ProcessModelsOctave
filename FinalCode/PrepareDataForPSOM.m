@@ -1,4 +1,4 @@
-function OutFolder = PrepareDataForPSOM(ModelInfo)
+function [pipeline, ModelInfo] =  PrepareDataForPSOM(ModelInfo)
 % In order for this program to work in both a cluster environment and a
 % single computer environment the data is saved and the analysis programs
 % are given a path name. The data specified by the path is then loaded, the
@@ -53,7 +53,7 @@ if ModelInfo.NJobSplit > 1
     switch ModelType
         case 'bootstrap'
             % For some reason the cd is causing problems!
-            cd(JobOutputFolder)
+            %cd(JobOutputFolder)
             % Here the data is split and saved as a series of small files.
             
             
@@ -86,6 +86,7 @@ if ModelInfo.NJobSplit > 1
                     % subset of voxels to be analyzed.
                     subModelInfo = ModelInfo;
                     subModelInfo.Indices = VoxelsForThisJob;
+                    subModelInfo.BaseDir = OutFolder;
                     for j = 1:ModelInfo.Nvar
                         % Check to see which variables are multi-voxel variables and
                         % extract the subset of data
@@ -99,14 +100,14 @@ if ModelInfo.NJobSplit > 1
                     Str = ['save ' InDataPath ' subModelInfo  '];
                     eval(Str);
                     % OutFile
-                    ResultsDir = fullfile(ModelInfo.BaseDir,'Results');
-                    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s.mat',i));
+                    ResultsDir = fullfile(OutFolder,'Results');
+                    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%04d.mat',i));
                     
                     % Setup the PSOM jobs
                     JobName = sprintf('psom_%04d',i);
                     pipeline = setfield(pipeline,JobName,{});
                     % Create string of the command to be run with MatLab
-                    Command = sprintf('Results = CycleOverVoxelsProcessBootstrap(''%s'');',InDataPath);
+                    Command = sprintf('addpath /home/steffejr/Scripts/ProcessModelsOctave/FinalCode; CycleOverVoxelsProcessBootstrap(''%s'');',InDataPath);
                     pipeline = setfield(pipeline,JobName,'command',Command);
                     InFile = 'dd';
                     pipeline = setfield(pipeline,JobName,'files_in',InDataPath);
@@ -239,12 +240,12 @@ else
             
             % Perform the point estimate calculation
             VoxelWiseProcessPermute(InDataPath,0,0)
-            % Perform the permutation tests
-            VoxelWiseProcessPermute(InDataPath,1,ModelInfo.Nperm)
+            % Perform the permutation tes
+            VoxelWiseProcessPermute(InDataPath,ModelInfo.Nperm)
             
     end
     fprintf(1,' Done!\n');
 end
 
-
+ModelInfo.BaseDir = OutFolder;
 
