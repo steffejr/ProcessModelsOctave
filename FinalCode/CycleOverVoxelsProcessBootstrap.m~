@@ -75,7 +75,7 @@ if Nvoxels > 1
         count = count + 1;
         %fprintf(1,'Finished %d jobs out of %d.\n',count,Nvoxels);
 	t = toc;
-        fprintf(1,'%d of %d voxels in %0.2f\n',i,Nvoxels,t);
+        fprintf(1,'%d of %d voxels in %0.2s\n',i,Nvoxels,t);
     end
 else
     % Extract the data for this voxel

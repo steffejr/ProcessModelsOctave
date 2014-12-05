@@ -80,7 +80,7 @@ ModelInfo.Thresholds = Thresh;
 ModelInfo.STRAT = [];
 ModelInfo.Nsub = size(data{1},1);
 ModelInfo.Nvar = Nvar;
-ModelInfo.Nvoxels = 1;
+ModelInfo.Nvoxels = Nvoxels;
 
 % Prepare the output data header
 DataHeader.fname = '';
@@ -143,5 +143,6 @@ Paths(2,3) = 2;
 Model1.Direct = Direct;
 Model1.Inter = Inter;
 Model1.Paths = Paths;
+
 
 
