@@ -25,9 +25,8 @@ if Model.Nboot > 0
         % Calculate the BCaci values for each parameter
         Results.BCaCI = CreateBCaCI(Results,BootStrap,JackKnife,Model.Thresholds);
 %        Results.BoLBBCaCI = BoLBBcACI;
-    catch 
-	me = lasterror.message;
-	fprintf(1,'%s\n', me);
+    catch me
+	fprintf(1,'%s\n', me.message);
 %        error('error!');
         Results = [];
     end

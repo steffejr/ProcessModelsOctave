@@ -1,4 +1,4 @@
-function OutFolder = PrepareDataForPSOM(ModelInfo)
+function [pipeline, ModelInfo] =  PrepareDataForPSOM(ModelInfo)
 % In order for this program to work in both a cluster environment and a
 % single computer environment the data is saved and the analysis programs
 % are given a path name. The data specified by the path is then loaded, the
@@ -53,7 +53,7 @@ if ModelInfo.NJobSplit > 1
     switch ModelType
         case 'bootstrap'
             % For some reason the cd is causing problems!
-            cd(JobOutputFolder)
+            %cd(JobOutputFolder)
             % Here the data is split and saved as a series of small files.
             
             
@@ -86,6 +86,7 @@ if ModelInfo.NJobSplit > 1
                     % subset of voxels to be analyzed.
                     subModelInfo = ModelInfo;
                     subModelInfo.Indices = VoxelsForThisJob;
+                    subModelInfo.BaseDir = OutFolder;
                     for j = 1:ModelInfo.Nvar
                         % Check to see which variables are multi-voxel variables and
                         % extract the subset of data
@@ -94,63 +95,61 @@ if ModelInfo.NJobSplit > 1
                         end
                     end
                     % Save this subset of data to a file
-                    InTag = sprintf('data_%04d',i);
+                    InTag = sprintf('data_%04d.mat',i);
                     InDataPath = fullfile(DataFolder,InTag);
                     Str = ['save ' InDataPath ' subModelInfo  '];
-                    eval(Str);
+                    %eval(Str);
                     % OutFile
-                    ResultsDir = fullfile(ModelInfo.BaseDir,'Results')
-                    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s',DataChunk));
+                    ResultsDir = fullfile(OutFolder,'Results');
+                    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%04d.mat',i));
                     
                     % Setup the PSOM jobs
                     JobName = sprintf('psom_%04d',i);
                     pipeline = setfield(pipeline,JobName,{});
                     % Create string of the command to be run with MatLab
-                    Command = sprintf('Results = CycleOverVoxelsProcessBootstrap(''%s'');',InDataPath);
+                    Command = sprintf('addpath /home/steffejr/Scripts/ProcessModelsOctave/FinalCode; CycleOverVoxelsProcessBootstrap(''%s'');',InDataPath);
                     pipeline = setfield(pipeline,JobName,'command',Command);
                     InFile = 'dd';
                     pipeline = setfield(pipeline,JobName,'files_in',InDataPath);
                     OutFile = 'dd';
-                    pipeline = setfield(pipeline,JobName,'files_out',OutFile);
-
-
-                    
-                    
-                    
-                    
+                    pipeline = setfield(pipeline,JobName,'files_out',ResultsFile);
                     
                 end
             end
-            % Remove initial comma from the WaitList
-            WaitList = WaitList(2:end);
-            % The following command is submitted to the cluster and given a
-            % list of all the previous processing jobs. This forces the
-            % write out of the resultant images to
-            % wait for all of the other jobs to finish first. These
-            % clean up commands and writing out the images do not need to be
-            % run on the cluster.
-            % The advantage of using the cluster queueing is that this job
-            % waits until other jobs finish. By having the cluster wait
-            % it frees up the MatLab process on the head node.
-            %
-            % Write out the resultant images
-            Command = sprintf('WriteOutResults(''%s'')',OutFolder);
-            jobPath = fullfile(InJobFolder,sprintf('WriteOutJob.sh'));
-            fid = fopen(jobPath,'w');
-            CreateClusterJobFile(Command,fid)
-            % Submit the job with the wait list.
-            SubmitClusterJob(jobPath,JobOutputFolder,WaitList);
+%             % Remove initial comma from the WaitList
+%             WaitList = WaitList(2:end);
+%             % The following command is submitted to the cluster and given a
+%             % list of all the previous processing jobs. This forces the
+%             % write out of the resultant images to
+%             % wait for all of the other jobs to finish first. These
+%             % clean up commands and writing out the images do not need to be
+%             % run on the cluster.
+%             % The advantage of using the cluster queueing is that this job
+%             % waits until other jobs finish. By having the cluster wait
+%             % it frees up the MatLab process on the head node.
+%             %
+%             % Write out the resultant images
+%             Command = sprintf('WriteOutResults(''%s'')',OutFolder);
+%             jobPath = fullfile(InJobFolder,sprintf('WriteOutJob.sh'));
+%             fid = fopen(jobPath,'w');
+%             CreateClusterJobFile(Command,fid)
+%             % Submit the job with the wait list.
+%             SubmitClusterJob(jobPath,JobOutputFolder,WaitList);
             
             
             % Save the data
             % This is actually redundent because the data is being split
             % and then the subsets saved. But it is very useful for
-            % rerunning a job(s).
+            % rerunning a job(s).	
+         	ModelInfo.BaseDir = OutFolder;
             ModelInfo.NJobSplit = ActualNJobSplit;
             InDataPath = fullfile(DataFolder,'ModelInfo');
             Str = ['save ' InDataPath ' ModelInfo '];
             eval(Str);
-            
+		 InDataPath = fullfile(DataFolder,'pipeline');
+		Str = ['save ' InDataPath ' pipeline '];
+		eval(Str);            
+
         case 'permutation'
             % here the data is used as a whole and only multiple results
             % files are created for each of the permutations
@@ -243,10 +242,11 @@ else
             Str = ['save ' InDataPath ' ModelInfo '];
             eval(Str);
             
+
             % Perform the point estimate calculation
             VoxelWiseProcessPermute(InDataPath,0,0)
-            % Perform the permutation tests
-            VoxelWiseProcessPermute(InDataPath,1,ModelInfo.Nperm)
+            % Perform the permutation tes
+            VoxelWiseProcessPermute(InDataPath,ModelInfo.Nperm)
             
     end
     fprintf(1,' Done!\n');

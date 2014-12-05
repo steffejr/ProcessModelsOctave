@@ -75,7 +75,7 @@ if Nvoxels > 1
         count = count + 1;
         %fprintf(1,'Finished %d jobs out of %d.\n',count,Nvoxels);
 	t = toc;
-        fprintf(1,'%d of %d voxels in %0.2f\n',i,Nvoxels,t);
+        fprintf(1,'%d of %d voxels in %0.2s\n',i,Nvoxels,t);
     end
 else
     % Extract the data for this voxel
@@ -100,7 +100,7 @@ end
 % if a structure of data was used as input. If the input was a path to a
 % file of data then save the results to a file.
 if ClusterJobFlag
-    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s.mat',DataChunk));
+    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s',DataChunk));
     Str = sprintf('save %s Results',ResultsFile);
     eval(Str)
 end

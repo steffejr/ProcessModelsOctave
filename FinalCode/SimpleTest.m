@@ -1,3 +1,6 @@
+addpath /home/steffejr/Scripts/psom
+addpath /home/steffejr/Scripts/ProcessModelsOctave/FinalCode
+
 Nvoxels = 50;
 NSub = 100;
 X = round(rand(NSub,1));
@@ -144,5 +147,7 @@ Model1.Direct = Direct;
 Model1.Inter = Inter;
 Model1.Paths = Paths;
 
-
+%%
+[pipeline, Model1] =  PrepareDataForPSOM(Model1)
+SubmitPSOMPipeline(pipeline,Model1)
 
