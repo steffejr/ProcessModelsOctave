@@ -140,12 +140,16 @@ if ModelInfo.NJobSplit > 1
             % Save the data
             % This is actually redundent because the data is being split
             % and then the subsets saved. But it is very useful for
-            % rerunning a job(s).
+            % rerunning a job(s).	
+         	ModelInfo.BaseDir = OutFolder;
             ModelInfo.NJobSplit = ActualNJobSplit;
             InDataPath = fullfile(DataFolder,'ModelInfo');
             Str = ['save ' InDataPath ' ModelInfo '];
             eval(Str);
-            
+		 InDataPath = fullfile(DataFolder,'pipeline');
+		Str = ['save ' InDataPath ' pipeline '];
+		eval(Str);            
+
         case 'permutation'
             % here the data is used as a whole and only multiple results
             % files are created for each of the permutations
@@ -238,6 +242,7 @@ else
             Str = ['save ' InDataPath ' ModelInfo '];
             eval(Str);
             
+
             % Perform the point estimate calculation
             VoxelWiseProcessPermute(InDataPath,0,0)
             % Perform the permutation tes
@@ -247,5 +252,5 @@ else
     fprintf(1,' Done!\n');
 end
 
-ModelInfo.BaseDir = OutFolder;
+
 

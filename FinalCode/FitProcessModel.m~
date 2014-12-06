@@ -48,26 +48,22 @@ for i = 1:M
         % eliminating all the regression metrics/tests that are performed
         % and only leave the absolute minimum.
         S = ProcessRegStats(data.data(:,i),[data.data(:,Col) Interaction]);
-	if ~isempty(S)
-        	% Once the regression model is fit, extract the required estimated
-        	% values.
-        	Results.beta([1; 1+find(data.Direct(:,i))],i) = S.beta(1:length(Col)+1);
-        	Results.B([1; 1+find(data.Direct(:,i))],i) = S.B(1:length(Col)+1);
-        	Results.t([1; 1+find(data.Direct(:,i))],i) = S.tstat.t(1:length(Col)+1);
-        	Results.se([1; 1+find(data.Direct(:,i))],i) = S.tstat.se(1:length(Col)+1);
-        	Results.p([1; 1+find(data.Direct(:,i))],i) = S.tstat.pval(1:length(Col)+1);
-        	if ~isempty(Interaction)
-        	    % Add the interaction terms
-        	    Results.beta(M+2:end,i) = S.beta(length(Col)+2:end);
-        	    Results.B(M+2:end,i) = S.B(length(Col)+2:end);
-        	    Results.t(M+2:end,i) = S.tstat.t(length(Col)+2:end);
-        	    Results.se(M+2:end,i) = S.tstat.se(length(Col)+2:end);
-        	    Results.p(M+2:end,i) = S.tstat.pval(length(Col)+2:end);
+        % Once the regression model is fit, extract the required estimated
+        % values.
+        Results.beta([1; 1+find(data.Direct(:,i))],i) = S.beta(1:length(Col)+1);
+        Results.B([1; 1+find(data.Direct(:,i))],i) = S.B(1:length(Col)+1);
+        Results.t([1; 1+find(data.Direct(:,i))],i) = S.tstat.t(1:length(Col)+1);
+        Results.se([1; 1+find(data.Direct(:,i))],i) = S.tstat.se(1:length(Col)+1);
+        Results.p([1; 1+find(data.Direct(:,i))],i) = S.tstat.pval(1:length(Col)+1);
+        if ~isempty(Interaction)
+            % Add the interaction terms
+            Results.beta(M+2:end,i) = S.beta(length(Col)+2:end);
+            Results.B(M+2:end,i) = S.B(length(Col)+2:end);
+            Results.t(M+2:end,i) = S.tstat.t(length(Col)+2:end);
+            Results.se(M+2:end,i) = S.tstat.se(length(Col)+2:end);
+            Results.p(M+2:end,i) = S.tstat.pval(length(Col)+2:end);
             
-        	end
-	else
-		Results = [];
-	end
+        end
     end
 end
 

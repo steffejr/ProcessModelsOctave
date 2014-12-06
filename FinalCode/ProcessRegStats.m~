@@ -8,7 +8,6 @@ function S = ProcessRegStats(y,design)
 % is in fact dichotomous then logistic regression is used.
 if isequal(logical(y),y)
     S = subfnLogisticRegressStats(y,design);
-	S = [];
 else
     % Add a column of ones to the design matrix
     %design = x2fx(design);

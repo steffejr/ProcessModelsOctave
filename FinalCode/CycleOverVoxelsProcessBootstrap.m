@@ -100,7 +100,7 @@ end
 % if a structure of data was used as input. If the input was a path to a
 % file of data then save the results to a file.
 if ClusterJobFlag
-    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s',DataChunk));
+    ResultsFile = fullfile(ResultsDir,sprintf('BootStrapResults_%s.mat',DataChunk));
     Str = sprintf('save %s Results',ResultsFile);
     eval(Str)
 end
