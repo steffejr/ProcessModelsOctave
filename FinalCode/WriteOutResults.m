@@ -134,32 +134,35 @@ switch ModelType
             for i = 1:length(Parameters)
                 % what is the overall index of voxels as described by this
                 % chunk of results
-                
-                Index = (k-1)*NvoxelsPerJob + i;
-                AllParameters{Index} = Parameters{i};
-                for ii = 1:m
-                    
-                        PointEstimate(ii,:,Index) = Parameters{i}.Paths{ii};
-                    
-                end
-                % cycle over thresholds
-                for j = 1:length(ModelInfo.Thresholds)
-                    BCaCIUpper(:,:,j,Index) = squeeze(Parameters{i}.BCaCI.Paths(:,:,1,:,j));
-                    BCaCILower(:,:,j,Index) = squeeze(Parameters{i}.BCaCI.Paths(:,:,2,:,j));
+                if ~isempty(Parameters{i})
+                    Index = (k-1)*NvoxelsPerJob + i;
+                    AllParameters{Index} = Parameters{i};
+                    for ii = 1:m
+                        
+                        PointEstimate(ii,:,Index) = Parameters{i}.Paths{1}(m,2);
+                        
+                    end
+                    % cycle over thresholds
+                    for j = 1:length(ModelInfo.Thresholds)
+                        BCaCIUpper(1,:,j,Index) = squeeze(Parameters{i}.BCaCI.Paths(m+1:2*m,:,1,:,j));
+                        BCaCILower(1,:,j,Index) = squeeze(Parameters{i}.BCaCI.Paths(m+1:2*m,:,2,:,j));
+                    end
                 end
             end
         end
-        WriteOutBootstrapPaths(ModelInfo,PointEstimate,BCaCIUpper,BCaCILower,m,n)
-        WriteOutParameterMaps('BCaCI.p',AllParameters,ModelInfo)
+        
+ %       WriteOutBootstrapPaths(ModelInfo,PointEstimate,BCaCIUpper,BCaCILower,m,n)
+ %       WriteOutParameterMaps('BCaCI.p',AllParameters,ModelInfo)
         
 
         % Write out the FDR thresholded p maps also
-
-        WriteOutParameterMaps('BCaCI.p',AllParameters,ModelInfo,1)
-        WriteOutParameterMaps('BCaCI.Z',AllParameters,ModelInfo)
-         WriteOutSingleMap('BCaCI.PathsZ',AllParameters,ModelInfo)
-         WriteOutSingleMap('BCaCI.PathsP',AllParameters,ModelInfo)
-         WriteOutSingleMap('BCaCI.PathsP',AllParameters,ModelInfo,1)
+       
+        
+%        WriteOutSurfaceParameterMaps('BCaCI.p',AllParameters,ModelInfo,1)
+        WriteOutSurfaceSingleMap('BCaCI.Z',AllParameters,ModelInfo)
+         WriteOutSurfaceParameterMaps('BCaCI.PathsZ',AllParameters,ModelInfo)
+         WriteOutSurfaceSingleMap('BCaCI.PathsP',AllParameters,ModelInfo)
+         WriteOutSurfaceSingleMap('BCaCI.PathsP',AllParameters,ModelInfo,1)
 end
 
 %% WRITE OUT ALL IMAGES from the regression models

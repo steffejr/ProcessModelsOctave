@@ -16,13 +16,15 @@ else
     temp = zeros([size(getfield(Parameters{1},Tag)) ModelInfo.Nvoxels]);
 end
 % If a subfield is passed.
-for i = 1:195000%ModelInfo.Nvoxels
-    if ~isempty(findstr(Tag,'.'))
-        Field = Tag(1:findstr(Tag,'.')-1);
-        temp1 = getfield(Parameters{i},Field);
-        temp(:,:,i) = getfield(temp1,Tag(findstr(Tag,'.')+1:end));
-    else
-        temp(:,:,i) = getfield(Parameters{i},Tag);
+for i = 1:ModelInfo.Nvoxels
+    if ~isempty(Parameters{i})
+        if ~isempty(findstr(Tag,'.'))
+            Field = Tag(1:findstr(Tag,'.')-1);
+            temp1 = getfield(Parameters{i},Field);
+            temp(:,:,i) = getfield(temp1,Tag(findstr(Tag,'.')+1:end));
+        else
+            temp(:,:,i) = getfield(Parameters{i},Tag);
+        end
     end
 end
 
@@ -72,8 +74,10 @@ for i = 1:ModelInfo.Nvar
                 Ilh(LHindices) = squeeze(temp(j+1,i,LHindices));
                 Irh(RHindices) = squeeze(temp(j+1,i,length(LHindices)+RHindices));
                 % Write data to files
-                WriteVertexFiles(Ilh,fullfile(ModelInfo.ResultsPath,[FileName '.lh.asc']),ModelInfo.lhVertices')
-                WriteVertexFiles(Irh,fullfile(ModelInfo.ResultsPath,[FileName '.rh.asc']),ModelInfo.rhVertices')
+                
+                
+                WriteVertexFiles(Ilh,fullfile(ModelInfo.ResultsPath,[FileName '.lh.asc']),ModelInfo.lhVertices,'lh')
+                WriteVertexFiles(Irh,fullfile(ModelInfo.ResultsPath,[FileName '.rh.asc']),ModelInfo.rhVertices,'rh')
             end
         end
     
@@ -85,7 +89,7 @@ for i = 1:ModelInfo.Nvar
             for j = 1:length(InterVar)
                 FileName = sprintf('%s%sX',FileName,ModelInfo.Names{InterVar(j)});
             end
-            FileName = sprintf('%s_%s.nii',FileName(1:end-1),Tag);
+            FileName = sprintf('%s_%s',FileName(1:end-1),Tag);
                 % Working with surface maps
                 Ilh = zeros(length(ModelInfo.lhVertices),1);
                 Irh = zeros(length(ModelInfo.rhVertices),1);
@@ -94,25 +98,13 @@ for i = 1:ModelInfo.Nvar
                 Ilh(LHindices) = squeeze(temp(j+1,i,LHindices));
                 Irh(RHindices) = squeeze(temp(j+1,i,length(LHindices)+RHindices));
                 % Write data to files
-                WriteVertexFiles(Ilh,fullfile(ModelInfo.ResultsPath,[FileName '.lh.asc']),ModelInfo.lhVertices)
-                WriteVertexFiles(Irh,fullfile(ModelInfo.ResultsPath,[FileName '.rh.asc']),ModelInfo.rhVertices)
+                WriteVertexFiles(Ilh,fullfile(ModelInfo.ResultsPath,[FileName '.lh.asc']),ModelInfo.lhVertices,'lh')
+                WriteVertexFiles(Irh,fullfile(ModelInfo.ResultsPath,[FileName '.rh.asc']),ModelInfo.rhVertices,'rh')
 
         
         end
     end
 end
 
-
-function WriteVertexFiles(Data,File,Vertices)
-fid = fopen(File,'w');
-if fid < 3
-    error('Cannot open file!');
-else
-    for i = 1:length(Data)
-        fprintf(fid,'%03d %0.5f %0.5f %0.5f %0.5f\n',Vertices(i,1),Vertices(i,2),Vertices(i,3),Vertices(i,4),Data(i,1));
-    end
-end
-fclose(fid);
-fprintf(1,'Data written to: %s\n',File);
 
 
